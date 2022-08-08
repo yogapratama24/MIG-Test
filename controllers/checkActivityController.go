@@ -188,3 +188,28 @@ func (activityController *ActivityController) ReadAttendanceController(c *gin.Co
 	}
 	helpers.NewHandlerResponse("Successfully get attendances", attendances).Success(c)
 }
+
+func (activityController *ActivityController) CheckOutController(c *gin.Context) {
+	checkInId, err := GetCheckInId(c)
+	if err != nil {
+		helpers.NewHandlerResponse("Please check-in first", nil).BadRequest(c)
+		return
+	}
+
+	if err := activityController.service.CheckOut(checkInId); err != nil {
+		helpers.NewHandlerResponse(err.Error(), nil).Failed(c)
+		return
+	}
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:    "check_in_id",
+		Value:   "",
+		Expires: time.Unix(0, 0),
+		Path:    "/",
+		// Local
+		SameSite: 2,
+		HttpOnly: true,
+	})
+
+	helpers.NewHandlerResponse("Successfully checkout", nil).Success(c)
+}

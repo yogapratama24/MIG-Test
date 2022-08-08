@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type CheckIn struct {
 	Id          int       `json:"id"`
@@ -20,8 +22,17 @@ type Activity struct {
 }
 
 type Attendance struct {
-	Id          int    `json:"id"`
-	DateCheckIn string `json:"date_check_in"`
-	UserId      int    `json:"user_id"`
-	UserName    string `json:"user_name"`
+	Id           int     `json:"id"`
+	DateCheckIn  string  `json:"date_check_in"`
+	DateCheckOut *string `json:"date_check_out"`
+	UserId       int     `json:"user_id"`
+	UserName     string  `json:"user_name"`
+}
+
+type CheckOut struct {
+	Id           int       `json:"id"`
+	CheckInId    int       `json:"check_in_id"`
+	DateCheckOut time.Time `json:"date_check_out"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }

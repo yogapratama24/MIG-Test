@@ -15,6 +15,7 @@ type ActivityRepository interface {
 	UpdateActivity(activity *models.Activity) error
 	DeleteActivity(id int) error
 	ReadAttendance(userId int) (*[]models.Attendance, error)
+	CheckOut(checkOut *models.CheckOut) error
 }
 
 type activityRepository struct {
@@ -152,9 +153,10 @@ func (r *activityRepository) ReadAttendance(userId int) (*[]models.Attendance, e
 	db := r.db
 	var result = []models.Attendance{}
 	sqlStatement := `SELECT check_ins.id, check_ins.user_id, DATE_FORMAT(check_ins.date_check_in, '%d %M %Y, %H:%i') as date_check_in,
-	users.user_name as user_name
+	users.user_name as user_name, DATE_FORMAT(check_outs.date_check_out, '%d %M %Y, %H:%i') as date_check_out
 	FROM check_ins
 	LEFT JOIN users ON check_ins.user_id=users.id
+	LEFT JOIN check_outs ON check_outs.check_in_id=check_ins.id
 	WHERE check_ins.user_id = ?
 	ORDER BY check_ins.date_check_in DESC`
 	rows, err := db.Query(sqlStatement, userId)
@@ -167,14 +169,27 @@ func (r *activityRepository) ReadAttendance(userId int) (*[]models.Attendance, e
 	for rows.Next() {
 		var attendance = models.Attendance{}
 
-		err := rows.Scan(&attendance.Id, &attendance.UserId, &attendance.DateCheckIn, &attendance.UserName)
+		err := rows.Scan(&attendance.Id, &attendance.UserId, &attendance.DateCheckIn, &attendance.UserName, &attendance.DateCheckOut)
 		if err != nil {
 			log.Printf("Error get data attendances with err: %s", err)
 			return nil, err
 		}
-
 		result = append(result, attendance)
 	}
 
 	return &result, nil
+}
+
+func (r *activityRepository) CheckOut(checkOut *models.CheckOut) error {
+	db := r.db
+	sqlStatement := `INSERT INTO check_outs (check_in_id, date_check_out, created_at, updated_at) VALUES (?, ?, ?, ?)`
+
+	_, err := db.Exec(sqlStatement, &checkOut.CheckInId, &checkOut.DateCheckOut, &checkOut.CreatedAt, &checkOut.UpdatedAt)
+
+	if err != nil {
+		log.Printf("Error create check out to database with err: %s", err)
+		return err
+	}
+
+	return nil
 }

@@ -14,6 +14,7 @@ type ActivityService interface {
 	UpdateActivity(id int, activity *models.Activity) error
 	DeleteActivity(Id int) error
 	ReadAttendance(userId int) (*[]models.Attendance, error)
+	CheckOut(checkInId int) error
 }
 
 type activityService struct {
@@ -100,4 +101,19 @@ func (s *activityService) ReadAttendance(userId int) (*[]models.Attendance, erro
 	}
 
 	return attendances, nil
+}
+
+func (s *activityService) CheckOut(checkInId int) error {
+	CheckoutCreate := models.CheckOut{
+		CheckInId:    checkInId,
+		DateCheckOut: time.Now(),
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+	if err := s.activityRepository.CheckOut(&CheckoutCreate); err != nil {
+		log.Printf("Error create checkout to database with err: %s", err)
+		return err
+	}
+
+	return nil
 }

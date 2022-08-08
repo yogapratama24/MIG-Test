@@ -50,5 +50,10 @@ func Init() {
 		attendance.GET("", activityController.ReadAttendanceController)
 	}
 
+	checkOut := v1.Group("check-out").Use(middlewares.Auth())
+	{
+		checkOut.POST("", activityController.CheckOutController)
+	}
+
 	e.Run(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")))
 }
