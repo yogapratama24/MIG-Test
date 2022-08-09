@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"mitramas_test/db"
 	"mitramas_test/routes"
 
 	"github.com/joho/godotenv"
@@ -13,6 +12,6 @@ func main() {
 	if errEnv != nil {
 		log.Fatalf("Error read env file with err: %s", errEnv)
 	}
-	db.Connect()
+	// db.Connect()
 	routes.Init()
 }

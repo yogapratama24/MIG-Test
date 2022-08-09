@@ -5,6 +5,7 @@ import (
 	"mitramas_test/controllers"
 	"mitramas_test/db"
 	"mitramas_test/middlewares"
+	"mitramas_test/migrations"
 	"mitramas_test/repositories"
 	"mitramas_test/services"
 	"os"
@@ -31,6 +32,8 @@ func Init() {
 	e.Use(gin.Recovery(), middlewares.Logger(), middlewares.CORSMiddleware())
 	v1 := e.Group("/api/v1")
 	{
+		v1.POST("/migrate", migrations.Migrate)
+		v1.POST("/migrate-refresh", migrations.MigrateFresh)
 		v1.POST("/register", authController.RegisterController)
 		v1.POST("/login", authController.LoginController)
 		v1.POST("/logout", authController.LogoutController).Use(middlewares.Auth())

@@ -7,7 +7,6 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/pressly/goose"
 )
 
 var (
@@ -33,22 +32,5 @@ func Connect() *sql.DB {
 		panic(err)
 	}
 	fmt.Println("Successfully connected to database")
-
-	if err := goose.SetDialect("mysql"); err != nil {
-		panic(err)
-	}
-
-	// if err := goose.Down(db, "migrations"); err != nil {
-	// 	panic(err)
-	// }
-
-	// ---RESET TABLE---
-	// if err := goose.Reset(db, "migrations"); err != nil {
-	// 	panic(err)
-	// }
-
-	if err := goose.Up(db, "migrations"); err != nil {
-		panic(err)
-	}
 	return db
 }
