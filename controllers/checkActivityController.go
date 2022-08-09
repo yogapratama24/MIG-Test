@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"log"
+	"mitramas_test/auth"
 	"mitramas_test/helpers"
 	"mitramas_test/models"
 	"mitramas_test/services"
@@ -51,13 +53,14 @@ func GetCheckInId(c *gin.Context) (int, error) {
 
 func (activityController *ActivityController) CheckInController(c *gin.Context) {
 	var checkInId int
-	userId, err := GetUserId(c)
+	userId, err := auth.ParseJWTClaims(c)
 	if err != nil {
-		helpers.NewHandlerResponse(err.Error(), nil).Failed(c)
+		log.Printf("Error read claims with err: %s", err)
+		helpers.NewHandlerResponse("Error read claims", nil).BadRequest(c)
 		return
 	}
 
-	checkInId, err = activityController.service.CheckIn(userId)
+	checkInId, err = activityController.service.CheckIn(*userId)
 	if err != nil {
 		helpers.NewHandlerResponse(err.Error(), nil).Failed(c)
 		return
@@ -108,16 +111,17 @@ func (activityController *ActivityController) CreateActivityController(c *gin.Co
 }
 
 func (activityController *ActivityController) ReadActivityController(c *gin.Context) {
-	userId, err := GetUserId(c)
+	userId, err := auth.ParseJWTClaims(c)
 	if err != nil {
-		helpers.NewHandlerResponse(err.Error(), nil).Failed(c)
+		log.Printf("Error read claims with err: %s", err)
+		helpers.NewHandlerResponse("Error read claims", nil).BadRequest(c)
 		return
 	}
 
 	startDate := c.Query("start_date")
 	endDate := c.Query("end_date")
 
-	activities, err := activityController.service.ReadActivity(userId, startDate, endDate)
+	activities, err := activityController.service.ReadActivity(*userId, startDate, endDate)
 	if err != nil {
 		helpers.NewHandlerResponse(err.Error(), nil).Failed(c)
 		return
@@ -175,13 +179,14 @@ func (activityController *ActivityController) DeleteActivityController(c *gin.Co
 }
 
 func (activityController *ActivityController) ReadAttendanceController(c *gin.Context) {
-	userId, err := GetUserId(c)
+	userId, err := auth.ParseJWTClaims(c)
 	if err != nil {
-		helpers.NewHandlerResponse(err.Error(), nil).Failed(c)
+		log.Printf("Error read claims with err: %s", err)
+		helpers.NewHandlerResponse("Error read claims", nil).BadRequest(c)
 		return
 	}
 
-	attendances, err := activityController.service.ReadAttendance(userId)
+	attendances, err := activityController.service.ReadAttendance(*userId)
 	if err != nil {
 		helpers.NewHandlerResponse(err.Error(), nil).Failed(c)
 		return
