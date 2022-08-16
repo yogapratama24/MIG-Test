@@ -27,6 +27,11 @@ func Init() {
 	activityService := services.NewActivityService(activityRepository)
 	activityController := controllers.NewActivityController(activityService)
 
+	// USER
+	userRepository := repositories.NewUserRepository(db)
+	userService := services.NewUserService(userRepository)
+	userController := controllers.NewUserController(userService)
+
 	gin.SetMode(gin.ReleaseMode)
 	e := gin.New()
 	e.Use(gin.Recovery(), middlewares.Logger(), middlewares.CORSMiddleware())
@@ -56,6 +61,11 @@ func Init() {
 	checkOut := v1.Group("check-out").Use(middlewares.Auth())
 	{
 		checkOut.POST("", activityController.CheckOutController)
+	}
+
+	user := v1.Group("user").Use(middlewares.Auth())
+	{
+		user.GET("", userController.ReadUserController)
 	}
 
 	e.Run(fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")))

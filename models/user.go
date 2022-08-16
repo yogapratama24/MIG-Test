@@ -16,3 +16,11 @@ type UserLogin struct {
 	Email    string `json:"email,omitempty" validate:"required"`
 	Password string `json:"password,omitempty" validate:"required"`
 }
+
+type UserResponse struct {
+	Id        int       `json:"id"`
+	UserName  string    `json:"user_name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
